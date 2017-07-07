@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.gtas</groupId>
@@ -8,7 +8,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>GTAS Parent Project</name>
-    
+
     <properties>
         <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,8 +19,12 @@
         <sonar-plugin.version>5.1</sonar-plugin.version>
         <elasticsearch.version>2.3.2</elasticsearch.version>
         <sonar.sources>src/main/java</sonar.sources>
-    </properties>    
-    
+        <!--set this to your docker acct name-->
+    		<docker.image.prefix>gtas</docker.image.prefix>
+        <!--Set to name of project-->
+    		<docker.image.name>gtasdocker</docker.image.name>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -53,7 +57,7 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>2.7.6</version>
-            </dependency>            
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -128,6 +132,45 @@
                     </execution>
                 </executions>
             </plugin>
+
+<!-- Docker plugin start-->
+            <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+
+            <configuration>
+
+            <images>
+            <image>
+              <name>${docker.image.prefix}/${docker.image.name}</name>
+              <build>
+                                <!--copies artficact to docker build dir in target-->
+                <assembly>
+                  <descriptorRef>artifact</descriptorRef>
+                  <dockerFileDir>${project.basedir}/.</dockerFileDir>
+                  <!-- <inline>
+                    <dependencySets>
+                      <dependencySet>
+                      <useProjectArtifact>true</useProjectArtifact>
+                      <includes>
+                        <include>gov.gtas:gtas-webapp</include>
+                      </includes>
+                      <outputFileNameMapping>gtas-webapp.war</outputFileNameMapping>
+                      </dependencySet>
+                    </dependencySets>
+                  </inline> -->
+                </assembly>
+                <tags>
+                  <tag>latest</tag>
+                  <tag>${project.version}</tag>
+                </tags>
+              </build>
+            </image>
+            </images>
+            </configuration>
+            </plugin>
+<!-- Docker plugin stop-->
         </plugins>
     </build>
 </project>
