@@ -1,5 +1,4 @@
-*.pptx
-*.zip
+
 gtas-parent/**/target/**
 !gtas-parent/pom.xml
 !gtas-parent/docker/**

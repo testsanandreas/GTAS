@@ -1,0 +1,27 @@
+machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - sudo pip install docker-compose
+
+test:
+  override:
+    - docker-compose up -d
+
+deployment:
+  hub:
+    branch: /.*/
+    commands:
+      - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+      - docker tag gtas_mariahost $DOCKER_HUB_USER_ID/mariahost:$CIRCLE_SHA1
+      - docker tag gtas_mariahost $DOCKER_HUB_USER_ID/mariahost:latest
+      - docker tag gtas_tomcatgtas $DOCKER_HUB_USER_ID/tomcatgtas:$CIRCLE_SHA1
+      - docker tag gtas_tomcatgtas $DOCKER_HUB_USER_ID/tomcatgtas:latest
+      - docker push $DOCKER_HUB_USER_ID/mariahost:$CIRCLE_SHA1
+      - docker push $DOCKER_HUB_USER_ID/mariahost:latest
+      - docker push $DOCKER_HUB_USER_ID/tomcatgtas:$CIRCLE_SHA1
+      - docker push $DOCKER_HUB_USER_ID/tomcatgtas:latest
